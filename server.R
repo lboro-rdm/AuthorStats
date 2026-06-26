@@ -86,7 +86,6 @@ server <- function(input, output, session) {
       options    = list(
         dom        = "Bfrtip",
         buttons    = list(
-          "copy",
           list(extend = "csv",   filename = filename),
           list(extend = "excel", filename = filename, title = "")
         ),
