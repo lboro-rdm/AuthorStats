@@ -4,13 +4,21 @@ server <- function(input, output, session) {
   status  <- reactiveVal("")
   
   observeEvent(input$search_btn, {
-    req(input$batch_csv, !is.na(input$author_id))
+    req(input$batch_csv,
+        !is.na(input$author_id),
+        nzchar(trimws(input$institution_id)),
+        nzchar(trimws(input$repo_slug)),
+        nzchar(trimws(input$fs_username)),
+        nzchar(trimws(input$fs_password)))
     
     results(NULL)
     status("Reading CSV…")
     
-    author_id <- input$author_id
-    csv_path  <- input$batch_csv$datapath
+    author_id  <- input$author_id
+    repo_slug  <- trimws(input$repo_slug)
+    username   <- trimws(input$fs_username)
+    password   <- input$fs_password
+    csv_path   <- input$batch_csv$datapath
     
     withProgress(message = "Fetching data…", value = 0, {
       
@@ -39,8 +47,8 @@ server <- function(input, output, session) {
         
         id     <- ids[[i]]
         detail <- get_article_detail(id)
-        views  <- get_stats(id, "views")
-        dls    <- get_stats(id, "downloads")
+        views  <- get_stats(id, "views",     repo_slug, username, password)
+        dls    <- get_stats(id, "downloads", repo_slug, username, password)
         
         rows[[i]] <- data.frame(
           Citation  = detail[["citation"]],
@@ -78,6 +86,7 @@ server <- function(input, output, session) {
       options    = list(
         dom        = "Bfrtip",
         buttons    = list(
+          "copy",
           list(extend = "csv",   filename = filename),
           list(extend = "excel", filename = filename, title = "")
         ),

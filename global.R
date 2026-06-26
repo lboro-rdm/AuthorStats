@@ -10,8 +10,6 @@ options(shiny.maxRequestSize = 500 * 1024^2)  # 500 MB
 
 # ---- CSV helper -------------------------------------------------------------
 
-# batch.csv has an 'authors' column containing JSON-like author lists and an
-# 'article_id' column. We search for the author_id anywhere in 'authors'.
 find_articles_for_author <- function(csv_path, author_id) {
   df <- tryCatch(
     read.csv(csv_path, stringsAsFactors = FALSE, check.names = FALSE),
@@ -20,12 +18,10 @@ find_articles_for_author <- function(csv_path, author_id) {
   
   if (is.null(df)) return(NULL)
   
-  # Normalise column names to lowercase for robustness
   names(df) <- tolower(trimws(names(df)))
   
   if (!all(c("article_id", "authors") %in% names(df))) return(NULL)
   
-  # Keep rows where the authors field contains the author_id as a whole token
   matched <- grepl(
     pattern = paste0("\\b", as.character(author_id), "\\b"),
     x       = df$authors,
@@ -49,13 +45,11 @@ get_article_detail <- function(article_id) {
   resp_body_json(resp)
 }
 
-get_stats <- function(article_id, stat_type = c("views", "downloads")) {
+get_stats <- function(article_id, stat_type = c("views", "downloads"), repo_slug, username, password) {
   stat_type <- match.arg(stat_type)
-  username  <- Sys.getenv("FSusername")
-  password  <- Sys.getenv("FSpassword")
   
   resp <- tryCatch(
-    request("https://stats.figshare.com/lboro/total") |>
+    request(paste0("https://stats.figshare.com/", repo_slug, "/total")) |>
       req_url_path_append(stat_type, "article", article_id) |>
       req_auth_basic(username, password) |>
       req_perform(),
