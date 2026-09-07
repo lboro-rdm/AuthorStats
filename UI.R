@@ -49,7 +49,7 @@ ui <- fluidPage(
                            accept      = c("text/csv", ".csv"),
                            buttonLabel = "Browse…",
                            placeholder = "No file selected"),
-                 numericInput("author_id", "Author ID",
+                 numericInput("author_id", "User/Author ID",
                               value = NA, min = 1, step = 1),
                  actionButton("search_btn", "Get Stats", class = "btn-primary btn-block"),
                  hr(),
@@ -84,7 +84,7 @@ ui <- fluidPage(
                    tags$li("Upload your ", tags$code("batch.csv"), " file. This should contain at
                   minimum an ", tags$code("article_id"), " column and an ",
                            tags$code("authors"), " column."),
-                   tags$li("Enter the numeric ", tags$strong("Author ID"), " for the researcher
+                   tags$li("Enter the numeric ", tags$strong("User/Author ID"), " for the researcher
                   you want to report on."),
                    tags$li("Click ", tags$strong("Get Stats"), ". The app will filter the CSV for
                   articles associated with that author, retrieve full metadata from the
